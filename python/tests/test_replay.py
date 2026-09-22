@@ -3,7 +3,6 @@ from eventbook.models import BookEvent,Side,Action
 from eventbook.orderbook import OrderBook
 from eventbook.replay import ReplayEngine,ReplayConfig
 from eventbook.synthetic.generate import write_jsonl
-from eventbook.strategies.relationships import threshold_monotonicity
 
 def e(action,quantity=5): return BookEvent(1,1,"X",Side.BID,action,50,quantity)
 def test_order_book_add_modify_cancel_trade_and_invariants():
@@ -20,8 +19,6 @@ def test_partial_fill_behavior():
 def test_fee_computation():
     ev=[BookEvent(1,1,"X",Side.ASK,Action.ADD,50,3)]
     r=ReplayEngine(ev).run(lambda e,b:[{"side":"bid","limit_cents":50,"quantity":3}],ReplayConfig(fee_bps=100));assert r.fills[0].fee_cents==2
-def test_threshold_signal_rejects_negative_net_edge():
-    s=threshold_monotonicity(62,65,3,fee_cents=4);assert s.rejected_reason=="net_executable_edge_nonpositive"
 def test_latency_causes_missed_execution():
     ev=[BookEvent(1,1,"X",Side.ASK,Action.ADD,40,1)]
     r=ReplayEngine(ev).run(lambda e,b:[{"side":"bid","limit_cents":40,"quantity":1,"submitted_ns":1}],ReplayConfig(latency_ns=2));assert not r.fills

@@ -1,0 +1,9 @@
+relationships:
+  - type: threshold_monotonicity
+    event: WEATHER_NYC_MAX_TEMP_SYNTHETIC
+    lower_threshold_ticker: TEMP_GT_50
+    higher_threshold_ticker: TEMP_GT_60
+  - type: mutually_exclusive
+    event: SYNTHETIC_RESOLUTION
+    tickers: [OUTCOME_A, OUTCOME_B]
+    payoff_bound_cents: 100

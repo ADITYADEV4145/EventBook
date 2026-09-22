@@ -37,3 +37,13 @@ def test_metrics_do_not_fabricate_unavailable_settlement_or_sharpe() -> None:
     assert metrics.gross_pnl_cents is None
     assert metrics.sharpe_ratio is None
     assert metrics.fill_rate is None
+
+
+def test_fifo_holding_period_uses_closed_lots_only() -> None:
+    fills = [
+        Fill("YES", Side.BID, 40, 2, 0, 10),
+        Fill("YES", Side.ASK, 60, 1, 0, 30),
+        Fill("YES", Side.ASK, 60, 1, 0, 50),
+    ]
+    metrics = evaluate_research_run(fills, {"YES": True}, [], [], [], 0, 0)
+    assert metrics.average_holding_period_ns == 30

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, defaultdict
+from collections import deque
 from dataclasses import asdict, dataclass
 from math import sqrt
 from random import Random
@@ -66,7 +67,7 @@ def evaluate_research_run(
         maximum_drawdown_cents=_maximum_drawdown(equity_curve),
         win_rate=_win_rate(trade_pnls),
         turnover_cents=sum(fill.price_cents * fill.quantity for fill in fills),
-        average_holding_period_ns=None,
+        average_holding_period_ns=_average_holding_period(fills),
         fill_rate=filled / requested if requested else None,
         canceled_order_rate=canceled_orders / submitted_order_count if submitted_order_count else None,
         adverse_selection_cents=_adverse_selection(fills, post_fill_marks),
@@ -113,6 +114,29 @@ def _maximum_drawdown(equity_curve: list[EquityPoint]) -> int | None:
 
 def _win_rate(trade_pnls: list[int]) -> float | None:
     return sum(pnl > 0 for pnl in trade_pnls) / len(trade_pnls) if trade_pnls else None
+
+
+def _average_holding_period(fills: list[Fill]) -> float | None:
+    """Match closing YES positions against the oldest open lot for each contract."""
+    open_lots: dict[str, deque[list[int]]] = defaultdict(deque)
+    holding_periods: list[int] = []
+    for fill in sorted(fills, key=lambda item: item.timestamp_ns):
+        direction = 1 if fill.side is Side.BID else -1
+        remaining = fill.quantity
+        lots = open_lots[fill.ticker]
+        while remaining and lots and lots[0][0] * direction < 0:
+            lot_direction, lot_quantity, opened_at = lots[0]
+            closed_quantity = min(remaining, lot_quantity)
+            holding_periods.extend([fill.timestamp_ns - opened_at] * closed_quantity)
+            remaining -= closed_quantity
+            lot_quantity -= closed_quantity
+            if lot_quantity:
+                lots[0][1] = lot_quantity
+            else:
+                lots.popleft()
+        if remaining:
+            lots.append([direction, remaining, fill.timestamp_ns])
+    return mean(holding_periods) if holding_periods else None
 
 
 def _adverse_selection(fills: list[Fill], post_fill_marks: dict[str, int] | None) -> float | None:

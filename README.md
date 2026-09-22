@@ -24,3 +24,23 @@ The demo deterministically creates a synthetic event stream with widening spread
 - Keep the collector read-only: no order submission, funding, or account mutation.
 
 See [architecture](docs/architecture.md), [assumptions](docs/assumptions.md), [protocol](docs/research_protocol.md), and [data governance](docs/data_governance.md).
+
+## Local-only collector and C++ bindings
+
+Convert an account-holder local JSONL capture to ignored Parquet and DuckDB metadata:
+
+```bash
+uv run python -m eventbook.collector.local_ingest /absolute/path/to/local_capture.jsonl
+```
+
+The capture must contain the documented event fields (`timestamp_ns`, `sequence`, `ticker`, `side`, `action`, `price_cents`, `quantity`, and optional `order_id`). The output stays under ignored `data/processed/` and `data/local_metadata.duckdb`.
+
+Build the optional pybind11 C++ order-book module:
+
+```bash
+uv run --with pybind11 python -m pybind11 --cmakedir
+cmake -S . -B build -DEVENTBOOK_BUILD_PYTHON_BINDINGS=ON -Dpybind11_DIR="$(uv run --with pybind11 python -m pybind11 --cmakedir)"
+cmake --build build
+```
+
+This exposes the C++ `OrderBook`, `BookLevel`, and `Side` primitives as `_eventbook_core`. The current Python replay is still the event-driven simulator; the binding gives researchers a verified C++ book primitive before a larger replay-core migration.

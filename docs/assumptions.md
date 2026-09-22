@@ -6,4 +6,6 @@ Phase 2 adds seeded uniform stochastic latency, marketable limits, passive maker
 
 Historical L2 events are treated as an immutable observed stream. Simulated fills do not rewrite later observed add, cancel, or trade events. A strategy is expected to submit at most one marketable order per ticker and book update; multi-order coordination with a shared local depth reservation is a future extension.
 
+Holding periods use FIFO matching for closed YES lots. Open lots are excluded from the average rather than assigned an artificial duration. The local collector only transforms user-provided files; it does not call exchange endpoints, submit orders, or persist credentials.
+
 Phase 3 relationships are manually authored YAML mappings. A threshold violation is executable only when selling the higher threshold at its best bid and buying the lower threshold at its best ask leaves a positive adjusted edge. Mutually exclusive contracts are evaluated by selling every YES leg at its bid when their combined proceeds exceed the one-contract settlement bound. Intersection and union bounds use the same sell-expensive/buy-cheaper executable direction. Per-unit fee adjustment is rounded up and latency is represented as an explicit cents penalty; these are conservative screening assumptions, not forecasts.

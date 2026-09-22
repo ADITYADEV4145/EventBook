@@ -51,3 +51,18 @@ def test_missing_quote_is_explicitly_rejected() -> None:
 def test_relationships_are_loaded_only_from_manual_yaml() -> None:
     relationships = load_relationships("configs/synthetic_relationships.yaml")
     assert relationships[0].tickers == ("TEMP_GT_50", "TEMP_GT_60")
+
+
+def test_intersection_and_union_bounds_use_executable_crosses() -> None:
+    books = dict([
+        book_with_quote("INTERSECTION", (60, 2), (62, 2)),
+        book_with_quote("UNION", (48, 2), (50, 2)),
+        book_with_quote("A", (55, 3), (57, 3)),
+        book_with_quote("B", (50, 4), (52, 4)),
+    ])
+    intersection = Relationship("intersection_upper_bound", "EVENT", ("INTERSECTION", "A", "B"))
+    union = Relationship("union_lower_bound", "EVENT", ("UNION", "A", "B"))
+    intersection_signal = detect_relationship(books, intersection, ExecutionAssumptions())
+    union_signal = detect_relationship(books, union, ExecutionAssumptions())
+    assert intersection_signal.executable_discrepancy_cents == 8
+    assert union_signal.executable_discrepancy_cents == 5

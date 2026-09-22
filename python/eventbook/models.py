@@ -12,4 +12,12 @@ class BookEvent:
         if not 0 <= self.price_cents <= 100 or self.quantity <= 0: raise ValueError("price must be 0..100 cents; quantity must be positive")
 @dataclass(frozen=True)
 class Fill:
-    ticker: str; side: Side; price_cents: int; quantity: int; fee_cents: int; timestamp_ns: int
+    ticker: str; side: Side; price_cents: int; quantity: int; fee_cents: int; timestamp_ns: int; liquidity: str = "taker"; order_id: str = ""
+
+@dataclass(frozen=True)
+class OrderRequest:
+    """Paper-only order request. A bid buys YES; an ask sells YES."""
+    ticker: str; side: Side; limit_cents: int; quantity: int; submitted_ns: int; order_id: str
+    def __post_init__(self):
+        if not 0 <= self.limit_cents <= 100 or self.quantity <= 0 or self.submitted_ns < 0:
+            raise ValueError("order has invalid price, quantity, or timestamp")

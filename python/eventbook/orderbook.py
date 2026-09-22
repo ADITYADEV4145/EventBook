@@ -31,3 +31,11 @@ class OrderBook:
             q=min(left,levels[p]); fills.append((p,q));left-=q
             if not left: break
         return fills
+    def consume(self, side:Side, fills:list[tuple[int,int]]):
+        """Remove taker fills from the opposite displayed book."""
+        d=self.levels[Side.ASK] if side is Side.BID else self.levels[Side.BID]
+        for price, quantity in fills:
+            if d[price] < quantity: raise ValueError("fill exceeds displayed depth")
+            d[price] -= quantity
+            if not d[price]: del d[price]
+        self._check()

@@ -1,0 +1,10 @@
+.env
+data/raw/
+data/**/*.parquet
+!data/synthetic/*.parquet
+results/*
+!results/README.md
+build/
+__pycache__/
+.pytest_cache/
+*.egg-info/

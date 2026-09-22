@@ -1,0 +1,7 @@
+mode: research
+dataset: data/synthetic/sample_events.jsonl
+execution:
+  latency_ns: 0
+  fee_bps: 0
+  queue_assumption: optimistic
+  position_limit: 100

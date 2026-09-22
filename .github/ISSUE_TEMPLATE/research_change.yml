@@ -1,0 +1,24 @@
+name: Research or modeling proposal
+description: Propose a bounded, testable change to a research assumption or metric.
+title: "research: "
+labels: [research]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+    validations:
+      required: true
+  - type: textarea
+    id: assumption
+    attributes:
+      label: Assumption and expected failure modes
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Proposed validation
+      description: Include time split, executable-price, and sensitivity considerations.
+    validations:
+      required: true

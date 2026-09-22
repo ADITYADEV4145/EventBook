@@ -1,4 +1,6 @@
 .env
+.env.*
+.DS_Store
 data/raw/
 data/processed/
 data/*.duckdb
@@ -9,4 +11,6 @@ results/*
 build/
 __pycache__/
 .pytest_cache/
+.coverage
+coverage.xml
 *.egg-info/

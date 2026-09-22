@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+      - name: Run Python tests
+        run: uv run --with pytest pytest -q
+      - name: Build and test C++ core
+        run: |
+          cmake -S . -B build
+          cmake --build build --parallel
+          ctest --test-dir build --output-on-failure
+      - name: Generate synthetic report
+        run: uv run python -m eventbook.reports.run --config configs/synthetic_baseline.yaml --output /tmp/eventbook-report
+      - name: Build and test pybind11 module
+        run: |
+          pybind11_dir="$(uv run --with pybind11 python -m pybind11 --cmakedir)"
+          cmake -S . -B build-bindings -DEVENTBOOK_BUILD_PYTHON_BINDINGS=ON -Dpybind11_DIR="$pybind11_dir"
+          cmake --build build-bindings --parallel
+          ctest --test-dir build-bindings --output-on-failure

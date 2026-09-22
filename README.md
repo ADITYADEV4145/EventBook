@@ -13,7 +13,7 @@ PYTHONPATH=python pytest -q
 PYTHONPATH=python python -m eventbook.reports.run --config configs/synthetic_baseline.yaml --output results/synthetic_baseline
 ```
 
-The demo deterministically creates a synthetic event stream with widening spread, partial depth, cancel-before-fill, a threshold discrepancy, and a resolved-contract quote. For Parquet ingestion install `pip install -e '.[data]'`, then use `ReplayEngine.from_parquet(...)`.
+The demo deterministically creates a synthetic event stream with widening spread, partial depth, cancel-before-fill, a threshold discrepancy, and a resolved-contract quote. It writes a one-page research report, Parquet trades, CSV outputs, and SVG charts. Use `ReplayEngine.from_parquet(...)` for local Parquet replay datasets.
 
 ## Future local collector checklist
 

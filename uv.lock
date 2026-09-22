@@ -16,22 +16,20 @@ name = "eventbook"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "polars" },
+    { name = "pyarrow" },
     { name = "pyyaml" },
 ]
 
 [package.optional-dependencies]
-data = [
-    { name = "polars" },
-    { name = "pyarrow" },
-]
 test = [
     { name = "pytest" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "polars", marker = "extra == 'data'", specifier = ">=1.0" },
-    { name = "pyarrow", marker = "extra == 'data'", specifier = ">=16" },
+    { name = "polars", specifier = ">=1.0" },
+    { name = "pyarrow", specifier = ">=16" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8" },
     { name = "pyyaml", specifier = ">=6.0" },
 ]

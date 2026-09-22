@@ -68,7 +68,6 @@ class ReplayEngine:
             if not book: return
             req=order.request; requested=min(order.remaining,capacity(req)); visible=book.executable(req.side,req.limit_cents,requested)
             if visible:
-                book.consume(req.side,visible)
                 for price,q in visible: fills.append(Fill(req.ticker,req.side,price,q,self._fee(price,q,config.taker_fee_bps or config.fee_bps),now,"taker",req.order_id))
                 order.remaining-=sum(q for _,q in visible)
                 log.append({"timestamp_ns":now,"ticker":req.ticker,"order_id":req.order_id,"requested":requested,"filled":sum(q for _,q in visible),"liquidity":"taker","reason":"filled" if not order.remaining else "partial_fill"})
